@@ -16,6 +16,7 @@ from pygame import mixer
 import eyed3
 
 class Audio:
+
 	def __init__(self):
 		self.track_paths = []
 		self.ispause = True
@@ -25,6 +26,24 @@ class Audio:
 
 		mixer.init(44100, -16, 4, 8192)
 		self.set_volume(0)
+
+	def play(self, num):
+		mixer.music.load(self.track_paths[num])
+		mixer.music.play()
+
+		self.nowplay = num
+		self.main_length = self.get_track_length(num)
+		self.ispause = False
+
+	def pause(self):
+		mixer.music.pause()
+
+		self.ispause = True
+
+	def unpause(self):
+		mixer.music.unpause()
+		
+		self.ispause = False
 
 	def playlist_bild(self, path):
 		names_playlist = []
@@ -42,30 +61,36 @@ class Audio:
 				pass
 
 			self.track_paths.append(track_path)
-			names_playlist.append(f'    {track_name[:-4]}{track_author}')
+			names_playlist.append(f'     {track_name[:-4]}{track_author}')
 		return names_playlist
 
-	def play(self, num):
-		mixer.music.load(self.track_paths[num])
-		mixer.music.play()
-
-		self.nowplay = num
-		self.main_length = self._get_length(num)
-		self.ispause = False
-
-	def unpause(self):
-		mixer.music.unpause()
-		
-		self.ispause = False
-
-	def go_to(self, time):
+	def set_timeline(self, time):
 
 		mixer.music.play(0, time)
 
-	def pause(self):
-		mixer.music.pause()
+	def set_volume(self,num):
+		self.volume += num
+		mixer.music.set_volume((100-(self.volume))/100)
 
-		self.ispause = True
+	def get_now_play(self):
+
+		return self.nowplay
+
+	def get_track_length(self, num):
+		music =  MP3(self.track_paths[num])
+		return int(music.info.length)
+
+	def get_length(self):
+
+		return self.main_length
+
+	def get_time(self):
+
+		return mixer.music.get_pos()//1000
+
+	def get_volume(self):
+
+		return self.volume
 
 	def is_pause(self):
 
@@ -75,60 +100,38 @@ class Audio:
 
 		return mixer.music.get_busy()
 
-	def now_play(self):
-
-		return self.nowplay
-
-	def _get_length(self, num):
-		music =  MP3(self.track_paths[num])
-		return int(music.info.length)
-
-	def get_length(self):
-		return self.main_length
-
-	def get_time(self):
-
-		return mixer.music.get_pos()//1000
-
-	def set_volume(self,num):
-		self.volume += num
-		mixer.music.set_volume((100-(self.volume))/100)
-
-	def get_volume(self):
-
-		return self.volume
-
 class File_Manager:
 
 	def get_path(self):
 		try:
-			path = self._read_path()
+			path = self.read_path()
 			if not path:
-				path = self._ask_dir()
+				path = self.ask_dir()
 				return path
 			return path
 		except:
-			path = self._ask_dir()
+			path = self.ask_dir()
 			return path
 
-	def _ask_dir(self):
+	def ask_dir(self):
 		path = askdirectory(initialdir="C:/Users/",
 							title = "Choose a folder with music")
-		self._write_path(path)
+		self.write_path(path)
 		return path
 
-	def _write_path(self, path):
+	def write_path(self, path):
 		dirr = open("bd.txt","w")
 		dirr.write(path)
 		dirr.close()
 
-	def _read_path(self):
+	def read_path(self):
 		dirr = open("bd.txt","r")
 		path = dirr.read()
 		dirr.close()
-		return path
+		return path.strip()
 
 class Display:
+
 	def __init__(self,root):
 		self.root = root
 		self.is_list_open = False
@@ -224,9 +227,6 @@ class Display:
 		for i in range(len(tracklist)):
 			self.main_list.insert(i,tracklist[i])
 
-	def timeline_long(self,length):
-		self.timeline_wheel.itemconfigure(self.time_line,extent=length)
-
 	def button_play(self):
 
 		self.play_botton.config(image=self.image3)
@@ -234,6 +234,10 @@ class Display:
 	def button_pause(self):
 
 		self.play_botton.config(image=self.image1)
+
+	def set_timeline_long(self,length):
+
+		self.timeline_wheel.itemconfigure(self.time_line,extent=length)
 
 	def select_track(self,index):
 		self.main_list.select_clear(0, "end")
@@ -267,14 +271,6 @@ class Display:
 		self.make_animation(self.root,-30,10,100)
 		self.is_win_hover = True
 
-	def now_select(self):
-		now_track = None
-		try:
-			now_track = self.main_list.curselection()[0]
-		except:
-			pass
-		return now_track
-
 	def make_animation(self,obj,x1,x2,y1):
 		way_x = x2 - x1
 		steps_x = way_x / 10
@@ -300,6 +296,14 @@ class Display:
 			obj.geometry(f"{f_x}x{f_y}")
 			self.root.update()
 			sleep(0.001)
+
+	def get_now_select(self):
+		now_track = None
+		try:
+			now_track = self.main_list.curselection()[0]
+		except:
+			pass
+		return now_track
 
 	def set_size(self,obj,w,h):
 
@@ -362,7 +366,7 @@ class Player:
 			if not self.dp.is_hover(40,100,260):
 				if not (self.dp.is_hover(440,100,260) and self.dp.is_listopen()):
 					if self.dp.is_listopen():
-						self.dp.hide_list(self.ap.now_play())
+						self.dp.hide_list(self.ap.get_now_play())
 					self.dp.hide_root()
 
 		else:
@@ -371,34 +375,32 @@ class Player:
 
 		if not self.ap.is_busy() and not self.ap.is_pause():
 			self.play_next()
-
 		now_time = self.ap.get_time() + self.main_time_change
-		self.dp.timeline_long(round(360*now_time/self.ap.get_length()))
+		self.dp.set_timeline_long(round(360*now_time/self.ap.get_length()))
 
 		self.dp.root.after(160,self.main_frame)
 
+	def play_track(self,num):
+		self.dp.button_play()
+		self.dp.set_timeline_long(0)
+
+		self.ap.play(num)
+
+		self.main_time_change = 0
 
 	def play_next(self):
-		now_track = self.ap.now_play()
+		now_track = self.ap.get_now_play()
 		if now_track + 1 > self.playlist_length -1:
 			now_track = -1
 		self.dp.select_track(now_track + 1)
 		self.play_track(now_track + 1)
 
 	def play_last(self):
-		now_track = self.ap.now_play()
+		now_track = self.ap.get_now_play()
 		if now_track - 1 < 0:
 			now_track = self.playlist_length
 		self.dp.select_track(now_track - 1)
 		self.play_track(now_track - 1)
-
-	def play_track(self,num):
-		self.dp.button_play()
-		self.dp.timeline_long(0)
-
-		self.ap.play(num)
-
-		self.main_time_change = 0
 
 	def pause_track(self):
 		self.dp.button_pause()
@@ -412,7 +414,7 @@ class Player:
 
 	def togle_list(self,event):
 		if self.dp.is_listopen():
-			self.dp.hide_list(self.ap.now_play())
+			self.dp.hide_list(self.ap.get_now_play())
 		else:
 			self.dp.look_list()
 
@@ -437,11 +439,11 @@ class Player:
 					self.main_time_change = self.ap.get_time() + self.main_time_change
 					self.main_time_change -= dire
 					if not self.ap.is_pause():
-						self.ap.go_to(self.main_time_change)
+						self.ap.set_timeline(self.main_time_change)
 
-	def togle_play(self,event=-1):
-		num = self.dp.now_select()
-		is_same = num == self.ap.now_play()
+	def togle_play(self,event=0):
+		num = self.dp.get_now_select()
+		is_same = num == self.ap.get_now_play()
 		if not self.ap.is_pause() and is_same:
 			self.pause_track()
 		else:
