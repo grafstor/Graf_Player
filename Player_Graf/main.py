@@ -6,8 +6,6 @@
 __version__ = "4.6"
 
 from os import startfile,  listdir
-# , getpid
-# from psutil import Process, HIGH_PRIORITY_CLASS
 import eyed3
 from mutagen.mp3 import MP3
 import win32api
@@ -20,8 +18,6 @@ from pygame import mixer
 class Palyer:
 
 	def __init__(self,root):
-		# PRIORIT = Process(getpid())
-		# PRIORIT.nice(HIGH_PRIORITY_CLASS)
 		self.root = root
 		self.pause = False
 		self.togle_list = False
@@ -55,10 +51,9 @@ class Palyer:
 			dirr.write(self.main_path)
 			dirr.close()
 
-		self.directory()
+		self.directory_bild()
 
 		self.main_frame()
-		# self.main_path = "D:\\media\\audio\\m"
 
 	def tk_bild(self):
 		vol_colorr = self.from_rgb((79,64,255))
@@ -145,7 +140,7 @@ class Palyer:
 		self.canvas.bind_all("<MouseWheel>", self.on_mousewheel)
 		self.root.bind("<Button-3>", self.close)
 
-	def directory(self):
+	def directory_bild(self):
 		self.music_dir = listdir(self.main_path)
 		self.music_dir = [i for i in self.music_dir if i.find("mp3") != -1]
 
@@ -163,7 +158,8 @@ class Palyer:
 
 	def ask_dir(self):
 		self.main_path = askdirectory(initialdir="C:/Users/",
-										  title = "Choose a folder with music")
+									  title = "Choose a folder with music")
+		
 	def main_frame(self):
 		if self.main_hover:
 			if not self.is_hover(40,100,260) and not (self.is_hover(440,100,260) and self.togle_list):
