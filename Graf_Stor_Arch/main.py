@@ -3,7 +3,7 @@
 	author: grafstor
 	date: 22.01.2020
 '''
-__version__ = "5"
+__version__ = "5.2"
 
 from tkinter.filedialog import askdirectory
 from PIL import ImageTk 
@@ -56,7 +56,15 @@ class Audio:
 			track_author = ' '
 
 			try:
-				track_author = f' - {track_info.tag.artist}'
+				artist = track_info.tag.artist.encode("cp1252").decode("cp1251")
+				print(artist,track_name)
+				n_artist = artist.split()
+				for word in n_artist:
+					if word.lower() in track_name.lower():
+						break
+				else:
+					track_author = f' - {artist}'
+
 			except:
 				pass
 
@@ -64,7 +72,7 @@ class Audio:
 			names_playlist.append(f'     {track_name[:-4]}{track_author}')
 		return names_playlist
 
-	def set_timeline(self, time):
+	def set_timeline(self, time): 
 
 		mixer.music.play(0, time)
 
@@ -155,9 +163,10 @@ class Display:
 		self.image5 = ImageTk.PhotoImage(file="5.png")
 
 		self.main_list_win = Toplevel(self.root)
-		self.main_list_win.geometry("{0}x{1}+{2}+{3}".format(0,160,25,-160))
+		self.main_list_win.geometry("{0}x{1}+{2}+{3}".format(0,159,25,-160))
 		self.main_list_win.config(bg=g_colorr)
 		self.main_list_win.lift()
+		self.main_list_win.attributes('-alpha', 0.9)
 		self.main_list_win.attributes('-topmost',True)
 		self.main_list_win.wm_attributes("-transparentcolor", "black")
 		self.main_list_win.overrideredirect(1)
@@ -251,16 +260,16 @@ class Display:
 		self.canvas.move(self.rect_mc, 0, num)
 
 	def hide_list(self,num):
-		self.make_animation_size(self.main_list_win,400,0,160,0)
-		self.set_poz(self.main_list_win,0,-160)
+		self.make_animation_size(self.main_list_win,400,0,159,0)
 		self.main_list_win.attributes('-topmost', True)
 		self.select_track(num)
+		self.set_poz(self.main_list_win,-10,-160)
 		self.is_list_open = False
 
 	def look_list(self):
 		self.main_list_win.attributes('-topmost', False)
-		self.set_poz(self.main_list_win,25, 100)
-		self.make_animation_size(self.main_list_win,0,400,0,160)
+		self.set_poz(self.main_list_win,25, 101)
+		self.make_animation_size(self.main_list_win,0,400,0,159)
 		self.is_list_open = True
 
 	def hide_root(self):
