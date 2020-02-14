@@ -1,2 +1,2 @@
 # Graf_Player
-Fast and comfortable audio play
+Fast and comfortable audio player
