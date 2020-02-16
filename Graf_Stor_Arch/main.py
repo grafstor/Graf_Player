@@ -3,7 +3,7 @@
 	author: grafstor
 	date: 22.01.2020
 '''
-__version__ = "5.2"
+__version__ = "5.3"
 
 from tkinter.filedialog import askdirectory
 from PIL import ImageTk 
@@ -12,8 +12,10 @@ from tkinter import *
 import win32api
 from os import startfile,  listdir
 from mutagen.mp3 import MP3
+from random import randint
 from pygame import mixer
 import eyed3
+import sys
 
 class Audio:
 
@@ -24,7 +26,7 @@ class Audio:
 		self.nowplay = -1
 		self.volume = 70
 
-		mixer.init(44100, -16, 4, 8192)
+		mixer.init(44100, -16, 64, 8192)
 		self.set_volume(0)
 
 	def play(self, num):
@@ -57,7 +59,6 @@ class Audio:
 
 			try:
 				artist = track_info.tag.artist.encode("cp1252").decode("cp1251")
-				print(artist,track_name)
 				n_artist = artist.split()
 				for word in n_artist:
 					if word.lower() in track_name.lower():
@@ -144,6 +145,7 @@ class Display:
 		self.root = root
 		self.is_list_open = False
 		self.is_win_hover = False
+		self.is_bottons_open = False
 
 	def draw_mainwindow(self, play_foo, list_togle_foo, mousewheel_foo, close_foo, togle_play_foo):
 
@@ -266,7 +268,8 @@ class Display:
 		self.set_poz(self.main_list_win,-10,-160)
 		self.is_list_open = False
 
-	def look_list(self):
+	def look_list(self,num):
+		self.select_track(num)
 		self.main_list_win.attributes('-topmost', False)
 		self.set_poz(self.main_list_win,25, 101)
 		self.make_animation_size(self.main_list_win,0,400,0,159)
@@ -280,13 +283,20 @@ class Display:
 		self.make_animation(self.root,-30,10,100)
 		self.is_win_hover = True
 
-	def make_animation(self,obj,x1,x2,y1):
+	def make_animation(self,obj,x1,x2,y1,y2=-1):
 		way_x = x2 - x1
 		steps_x = way_x / 10
 
+		way_y = y2 - y1
+		steps_y = way_y / 10
+
 		for i in range(1,11):
 			f_x = round(x1 + i * steps_x)
-			f_y = round(y1)
+			if y2 == -1:
+				f_y = round(y1)
+			else:
+				f_y = round(y1 + i * steps_y)
+
 			obj.geometry(f"+{f_x}+{f_y}")
 			self.root.update()
 			sleep(0.004)
@@ -334,6 +344,10 @@ class Display:
 
 		return self.is_win_hover
 
+	def is_bottonsopen(self):
+
+		return self.is_bottons_open
+
 	def is_hover(self,x1,y1,y2,x2=-2):
 		x, y = win32api.GetCursorPos()
 		if (x < x1 and x > x2) and (y > y1 and y < y2):
@@ -366,7 +380,20 @@ class Player:
 		playlist = self.ap.playlist_bild(main_path)
 		self.playlist_length = len(playlist)
 
-		self.display.draw_list(playlist)
+		self.dp.look_root()
+		self.dp.draw_list(playlist)
+
+		sleep(1.2)
+
+		for name in sys.argv:
+			if name.isdigit():
+				self.play_track(randint(1,len(playlist)))
+			else:
+				for track in range(len(playlist)):
+					if name in playlist[track].lower():
+						self.play_track(track)
+						if not randint(0,6):
+							break
 
 		self.main_frame()
 
@@ -425,7 +452,7 @@ class Player:
 		if self.dp.is_listopen():
 			self.dp.hide_list(self.ap.get_now_play())
 		else:
-			self.dp.look_list()
+			self.dp.look_list(self.ap.get_now_play())
 
 	def on_mousewheel(self,event):
 		if self.dp.is_winhover():
