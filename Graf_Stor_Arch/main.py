@@ -2,8 +2,16 @@
 '''
 	author: grafstor
 	date: 22.01.2020
+
+	version 5.3:
+		- file encode problems
+ 		- volume
+		- tracks rewinding
+		- rewinding
+		- audio list
+		- pause
 '''
-__version__ = "5"
+__version__ = "5.3"
 
 from tkinter.filedialog import askdirectory
 from PIL import ImageTk 
@@ -12,8 +20,10 @@ from tkinter import *
 import win32api
 from os import startfile,  listdir
 from mutagen.mp3 import MP3
+from random import randint
 from pygame import mixer
 import eyed3
+import sys
 
 class Audio:
 
@@ -24,7 +34,7 @@ class Audio:
 		self.nowplay = -1
 		self.volume = 70
 
-		mixer.init(44100, -16, 4, 8192)
+		mixer.init(44100, -16, 64, 8192)
 		self.set_volume(0)
 
 	def play(self, num):
@@ -56,7 +66,14 @@ class Audio:
 			track_author = ' '
 
 			try:
-				track_author = f' - {track_info.tag.artist}'
+				artist = track_info.tag.artist.encode("cp1252").decode("cp1251")
+				n_artist = artist.split()
+				for word in n_artist:
+					if word.lower() in track_name.lower():
+						break
+				else:
+					track_author = f' - {artist}'
+
 			except:
 				pass
 
@@ -64,7 +81,7 @@ class Audio:
 			names_playlist.append(f'     {track_name[:-4]}{track_author}')
 		return names_playlist
 
-	def set_timeline(self, time):
+	def set_timeline(self, time): 
 
 		mixer.music.play(0, time)
 
@@ -136,6 +153,7 @@ class Display:
 		self.root = root
 		self.is_list_open = False
 		self.is_win_hover = False
+		self.is_bottons_open = False
 
 	def draw_mainwindow(self, play_foo, list_togle_foo, mousewheel_foo, close_foo, togle_play_foo):
 
@@ -155,9 +173,10 @@ class Display:
 		self.image5 = ImageTk.PhotoImage(file="5.png")
 
 		self.main_list_win = Toplevel(self.root)
-		self.main_list_win.geometry("{0}x{1}+{2}+{3}".format(0,160,25,-160))
+		self.main_list_win.geometry("{0}x{1}+{2}+{3}".format(0,159,25,-160))
 		self.main_list_win.config(bg=g_colorr)
 		self.main_list_win.lift()
+		self.main_list_win.attributes('-alpha', 0.9)
 		self.main_list_win.attributes('-topmost',True)
 		self.main_list_win.wm_attributes("-transparentcolor", "black")
 		self.main_list_win.overrideredirect(1)
@@ -251,16 +270,17 @@ class Display:
 		self.canvas.move(self.rect_mc, 0, num)
 
 	def hide_list(self,num):
-		self.make_animation_size(self.main_list_win,400,0,160,0)
-		self.set_poz(self.main_list_win,0,-160)
+		self.make_animation_size(self.main_list_win,400,0,159,0)
 		self.main_list_win.attributes('-topmost', True)
 		self.select_track(num)
+		self.set_poz(self.main_list_win,-10,-160)
 		self.is_list_open = False
 
-	def look_list(self):
+	def look_list(self,num):
+		self.select_track(num)
 		self.main_list_win.attributes('-topmost', False)
-		self.set_poz(self.main_list_win,25, 100)
-		self.make_animation_size(self.main_list_win,0,400,0,160)
+		self.set_poz(self.main_list_win,25, 101)
+		self.make_animation_size(self.main_list_win,0,400,0,159)
 		self.is_list_open = True
 
 	def hide_root(self):
@@ -278,6 +298,7 @@ class Display:
 		for i in range(1,11):
 			f_x = round(x1 + i * steps_x)
 			f_y = round(y1)
+
 			obj.geometry(f"+{f_x}+{f_y}")
 			self.root.update()
 			sleep(0.004)
@@ -325,6 +346,10 @@ class Display:
 
 		return self.is_win_hover
 
+	def is_bottonsopen(self):
+
+		return self.is_bottons_open
+
 	def is_hover(self,x1,y1,y2,x2=-2):
 		x, y = win32api.GetCursorPos()
 		if (x < x1 and x > x2) and (y > y1 and y < y2):
@@ -357,7 +382,21 @@ class Player:
 		playlist = self.ap.playlist_bild(main_path)
 		self.playlist_length = len(playlist)
 
-		self.display.draw_list(playlist)
+		self.dp.draw_list(playlist)
+
+		self.dp.look_root()
+
+		sleep(1.2)
+
+		for name in sys.argv:
+			if name.isdigit():
+				self.play_track(randint(1,len(playlist)))
+			else:
+				for track in range(len(playlist)):
+					if name in playlist[track].lower():
+						self.play_track(track)
+						if not randint(0,6):
+							break
 
 		self.main_frame()
 
@@ -416,7 +455,7 @@ class Player:
 		if self.dp.is_listopen():
 			self.dp.hide_list(self.ap.get_now_play())
 		else:
-			self.dp.look_list()
+			self.dp.look_list(self.ap.get_now_play())
 
 	def on_mousewheel(self,event):
 		if self.dp.is_winhover():
