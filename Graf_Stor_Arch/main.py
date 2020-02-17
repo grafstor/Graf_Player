@@ -1,4 +1,5 @@
 #Graf_Player
+
 '''
 	author: grafstor
 	date: 22.01.2020
@@ -10,7 +11,9 @@
 		- rewinding
 		- audio list
 		- pause
+
 '''
+
 __version__ = "5.3"
 
 from tkinter.filedialog import askdirectory
@@ -82,7 +85,6 @@ class Audio:
 		return names_playlist
 
 	def set_timeline(self, time): 
-
 		mixer.music.play(0, time)
 
 	def set_volume(self,num):
@@ -90,7 +92,6 @@ class Audio:
 		mixer.music.set_volume((100-(self.volume))/100)
 
 	def get_now_play(self):
-
 		return self.nowplay
 
 	def get_track_length(self, num):
@@ -98,23 +99,18 @@ class Audio:
 		return int(music.info.length)
 
 	def get_length(self):
-
 		return self.main_length
 
 	def get_time(self):
-
 		return mixer.music.get_pos()//1000
 
 	def get_volume(self):
-
 		return self.volume
 
 	def is_pause(self):
-
 		return self.ispause
 
 	def is_busy(self):
-
 		return mixer.music.get_busy()
 
 class File_Manager:
@@ -155,13 +151,18 @@ class Display:
 		self.is_win_hover = False
 		self.is_bottons_open = False
 
-	def draw_mainwindow(self, play_foo, list_togle_foo, mousewheel_foo, close_foo, togle_play_foo):
+	def draw_mainwindow(self,
+						play_foo,
+						list_togle_foo,
+						mousewheel_foo,
+						close_foo,
+						togle_play_foo):
 
 		vol_colorr = self.from_rgb((79,64,255))
 		g_colorr = self.from_rgb((34,34,34))
 
 		self.root.overrideredirect(1)
-		self.root.geometry("{0}x{1}+{2}+{3}".format(30,160,0,-160))
+		self.root.geometry(f'{30}x{160}+{0}+{-160}')
 		self.root.config(bg="grey10")
 		self.root.lift()
 		self.root.attributes('-topmost',True)
@@ -173,7 +174,7 @@ class Display:
 		self.image5 = ImageTk.PhotoImage(file="5.png")
 
 		self.main_list_win = Toplevel(self.root)
-		self.main_list_win.geometry("{0}x{1}+{2}+{3}".format(0,159,25,-160))
+		self.main_list_win.geometry(f'{0}x{159}+{25}+{-160}')
 		self.main_list_win.config(bg=g_colorr)
 		self.main_list_win.lift()
 		self.main_list_win.attributes('-alpha', 0.9)
@@ -181,10 +182,14 @@ class Display:
 		self.main_list_win.wm_attributes("-transparentcolor", "black")
 		self.main_list_win.overrideredirect(1)
 
-		list_border = Label(self.main_list_win,image=self.image5, bd=0)
+		list_border = Label(self.main_list_win,
+						    image=self.image5,
+						    bd=0)
 		list_border.pack(side="right")
 
-		self.main_list = Listbox(self.main_list_win,height=100,width=100)  
+		self.main_list = Listbox(self.main_list_win,
+								height=100,
+								width=100)  
 		self.main_list.config(bd=0,
 								 bg=g_colorr,
 								 fg="white",
@@ -195,9 +200,13 @@ class Display:
 								 highlightthickness=0,
 								 activestyle="none"
 								 )
-		self.main_list.pack(side='right',fill="x")
+		self.main_list.pack(side='right',
+							fill="x")
 
-		self.timeline_wheel = Canvas(self.root,bg="black",height=30,width=30)
+		self.timeline_wheel = Canvas(self.root,
+									 bg="black",
+									 height=30,
+									 width=30)
 		self.timeline_wheel.config(bg=g_colorr,
 								bd=0,
 								relief='ridge',
@@ -224,18 +233,26 @@ class Display:
 						   bd=0,
 						   relief='ridge',
 						   highlightthickness=0,)
-		self.rect_m = self.canvas.create_rectangle(0, 0,30, 100,fill=vol_colorr,outline=vol_colorr)
+		self.rect_m = self.canvas.create_rectangle(0, 0,30, 100,
+												   fill=vol_colorr,
+												   outline=vol_colorr)
 		self.canvas.move(self.rect_m,0,70)
-		self.rect_mc = self.canvas.create_oval(0, 0, 30,30,outline=vol_colorr,fill=vol_colorr)
+		self.rect_mc = self.canvas.create_oval(0, 0, 30,30,
+											   outline=vol_colorr,
+											   fill=vol_colorr)
 		self.canvas.move(self.rect_mc,0,70-15)
 
-		self.play_botton = Button(self.root,image=self.image1,height=30,width=30)
+		self.play_botton = Button(self.root,
+								  image=self.image1,
+								  height=30,
+								  width=30)
 		self.play_botton.config(bd=0,
 								bg="grey10",
 								command=togle_play_foo)
 		self.play_botton.pack( side='bottom')
 
-		self.canvas.pack(side="top",fill="both")
+		self.canvas.pack(side="top",
+						 fill="both")
 
 		self.main_list.bind('<ButtonRelease-1>', play_foo)
 		self.timeline_wheel.bind("<Button-1>", list_togle_foo)
@@ -256,7 +273,8 @@ class Display:
 
 	def set_timeline_long(self,length):
 
-		self.timeline_wheel.itemconfigure(self.time_line,extent=length)
+		self.timeline_wheel.itemconfigure(self.time_line,
+										  extent=length)
 
 	def select_track(self,index):
 		self.main_list.select_clear(0, "end")
@@ -295,7 +313,6 @@ class Display:
 		way_x = x2 - x1
 		steps_x = way_x / 10
 
-
 		for i in range(1,11):
 			f_x = round(x1 + i * steps_x)
 			f_y = round(y1)
@@ -321,6 +338,7 @@ class Display:
 
 	def get_now_select(self):
 		now_track = None
+
 		try:
 			now_track = self.main_list.curselection()[0]
 		except:
@@ -328,27 +346,21 @@ class Display:
 		return now_track
 
 	def set_size(self,obj,w,h):
-
 		obj.geometry(f"{w}x{h}")
 
 	def set_poz(self,obj,x,y):
-
 		obj.geometry(f'+{x}+{y}') 	
 
 	def from_rgb(self,rgb):
-		
 		return "#%02x%02x%02x" % rgb 
 
 	def is_listopen(self):
-
 		return self.is_list_open
 
 	def is_winhover(self):
-
 		return self.is_win_hover
 
 	def is_bottonsopen(self):
-
 		return self.is_bottons_open
 
 	def is_hover(self,x1,y1,y2,x2=-2):
@@ -358,7 +370,6 @@ class Display:
 		return False
 
 	def close(self):
-
 		self.root.destroy()
 
 class Player:
