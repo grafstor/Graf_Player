@@ -295,6 +295,7 @@ class Display:
 		way_x = x2 - x1
 		steps_x = way_x / 10
 
+
 		for i in range(1,11):
 			f_x = round(x1 + i * steps_x)
 			f_y = round(y1)
