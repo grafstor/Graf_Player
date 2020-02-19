@@ -83,7 +83,7 @@ class Display:
 													start=90,
 													extent=0,
 													style=ARC,
-													outline='green',
+													outline=self.from_rgb((120,6,255)),
 													width=3
 													)
 		self.timeline_wheel.pack(side="top")

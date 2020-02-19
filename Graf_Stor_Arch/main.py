@@ -20,7 +20,7 @@
 __version__ = "5.4"
 
 from random import randint
-from tkinter import Tk
+from tkinter import Tk, mainloop
 from time import sleep
 import sys
 from filemanager import File_Manager
@@ -143,13 +143,14 @@ class Player:
 			elif self.dp.is_hover(40,100,130):
 				if self.main_time_change - dire < 360 and self.main_time_change - dire > 0:
 					self.main_time_change = self.ap.get_time() + self.main_time_change
-					self.main_time_change -= dire
+					self.main_time_change -= dire*1.7
 					if not self.ap.is_pause():
 						self.ap.set_timeline(self.main_time_change)
 
 	def togle_play(self,event=0):
 		num = self.dp.get_now_select()
 		is_same = num == self.ap.get_now_play()
+		
 		if not self.ap.is_pause() and is_same:
 			self.pause_track()
 		else:
@@ -166,4 +167,4 @@ class Player:
 if __name__ == "__main__":
 	root = Tk()
 	main_player = Player(root)
-	# mainloop()
+	mainloop()
