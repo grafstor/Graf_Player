@@ -16,7 +16,7 @@
         - pause
 '''
 
-__version__ = "5.4"
+__version__ = "5.5"
 
 from random import randint
 from tkinter import Tk, mainloop
@@ -41,14 +41,20 @@ class Player:
                                      self.togle_list,
                                      self.on_mousewheel,
                                      self.close,
-                                     self.togle_play,)
+                                     self.togle_play,
+                                     self.open_menu)
 
         main_path = self.filemanager.get_path()
 
         playlist = self.ap.playlist_bild(main_path)
         self.playlist_length = len(playlist)
+        optionslist = [" тема",
+                       " поиск",
+                       " + папка",
+                       " настройки",]
 
         self.dp.draw_list(playlist)
+        self.dp.draw_menu(optionslist)
 
         self.dp.look_root()
 
@@ -70,6 +76,8 @@ class Player:
         if self.dp.is_winhover():
             if not self.dp.is_hover(40,100,260):
                 if not (self.dp.is_hover(440,100,260) and self.dp.is_listopen()):
+                    if self.dp.is_menuopen():
+                        self.dp.hide_menu()
                     if self.dp.is_listopen():
                         self.dp.hide_list(self.ap.get_now_play())
                     self.dp.hide_root()
@@ -120,6 +128,8 @@ class Player:
     def togle_list(self,event):
         if self.dp.is_listopen():
             self.dp.hide_list(self.ap.get_now_play())
+            if self.dp.is_menuopen():
+                self.dp.hide_menu()
         else:
             self.dp.look_list(self.ap.get_now_play())
 
@@ -158,6 +168,10 @@ class Player:
             else:
                 if num != None:
                     self.play_track(num)
+                    
+    def open_menu(self, event):
+        print(110)
+        self.dp.look_menu()
 
     def close(self,event):
         self.dp.close()
