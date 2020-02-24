@@ -49,7 +49,7 @@ class Display:
         self.main_list_win.attributes('-topmost',True)
         self.main_list_win.wm_attributes("-transparentcolor", "black")
         self.main_list_win.overrideredirect(1)
-#=======================================================================
+
         self.main_menu = Toplevel(self.root)
         self.main_menu.geometry(f'{100}x{0}+{0}+{-100}')
         self.main_menu.config(bg=g_colorr)
@@ -84,7 +84,6 @@ class Display:
                                  )
         self.menu_list.pack(side='right',
                             fill="x")
-#=======================================================================
 
         list_border = Label(self.main_list_win,
                             image=self.image5,
@@ -209,7 +208,6 @@ class Display:
         self.set_poz(self.main_list_win,25, 101)
         self.make_animation_size(self.main_list_win,0,400,0,159)
         self.is_list_open = True
-#=======================================================================
 
     def hide_menu(self):
         self.make_animation_size(self.main_menu, 100, 100, 110, 0)
@@ -221,8 +219,6 @@ class Display:
         self.set_poz(self.main_menu, x, y)
         self.make_animation_size(self.main_menu, 100, 100, 0, 110)
         self.is_menu_open = True
-#=======================================================================
-
 
     def hide_root(self):
         self.make_animation(self.root,10,-30,100)

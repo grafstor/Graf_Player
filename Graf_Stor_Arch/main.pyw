@@ -4,6 +4,9 @@
     author: grafstor
     date: 22.01.2020
 
+    version 5.5:
+        - add menu shape
+
     version 5.4:
         - refaktoring
 
@@ -170,7 +173,6 @@ class Player:
                     self.play_track(num)
                     
     def open_menu(self, event):
-        print(110)
         self.dp.look_menu()
 
     def close(self,event):
