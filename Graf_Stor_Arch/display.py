@@ -1,4 +1,5 @@
-from PIL import ImageTk 
+from PIL import ImageTk
+import PIL.Image
 from time import sleep
 from tkinter import *
 import win32api
@@ -10,13 +11,16 @@ class Display:
         self.is_list_open = False
         self.is_win_hover = False
         self.is_bottons_open = False
+        self.is_menu_open = False
+
 
     def draw_mainwindow(self,
                         play_foo,
                         list_togle_foo,
                         mousewheel_foo,
                         close_foo,
-                        togle_play_foo):
+                        togle_play_foo,
+                        menu_foo):
 
         vol_colorr = self.from_rgb((79,64,255))
         g_colorr = self.from_rgb((34,34,34))
@@ -32,6 +36,10 @@ class Display:
         self.image2 = ImageTk.PhotoImage(file="2.png")
         self.image3 = ImageTk.PhotoImage(file="3.png")
         self.image5 = ImageTk.PhotoImage(file="5.png")
+        image = PIL.Image.open("6.png")
+        self.image6 = ImageTk.PhotoImage(image)
+        self.image7 = ImageTk.PhotoImage(image.rotate(180))
+
 
         self.main_list_win = Toplevel(self.root)
         self.main_list_win.geometry(f'{0}x{159}+{25}+{-160}')
@@ -41,6 +49,41 @@ class Display:
         self.main_list_win.attributes('-topmost',True)
         self.main_list_win.wm_attributes("-transparentcolor", "black")
         self.main_list_win.overrideredirect(1)
+
+        self.main_menu = Toplevel(self.root)
+        self.main_menu.geometry(f'{100}x{0}+{0}+{-100}')
+        self.main_menu.config(bg=g_colorr)
+        self.main_menu.lift()
+        self.main_menu.attributes('-alpha', 1)
+        self.main_menu.attributes('-topmost',True)
+        self.main_menu.wm_attributes("-transparentcolor", "black")
+        self.main_menu.overrideredirect(1)
+
+        main_border_top = Label(self.main_menu,
+                            image=self.image6,
+                            bd=0)
+        main_border_top.pack(side="top")
+
+        main_border_bottom = Label(self.main_menu,
+                            image=self.image7,
+                            bd=0)
+        main_border_bottom.pack(side="bottom")
+
+        self.menu_list = Listbox(self.main_menu,
+                                height=100,
+                                width=100)  
+        self.menu_list.config(bd=0,
+                                 bg=g_colorr,
+                                 fg=vol_colorr,
+                                 font=("Calibri", 12),
+                                 selectbackground="grey40",
+                                 highlightcolor="grey40",
+                                 selectmode="SINGLE",
+                                 highlightthickness=0,
+                                 activestyle="none"
+                                 )
+        self.menu_list.pack(side='right',
+                            fill="x")
 
         list_border = Label(self.main_list_win,
                             image=self.image5,
@@ -118,10 +161,15 @@ class Display:
         self.timeline_wheel.bind("<Button-1>", list_togle_foo)
         self.canvas.bind_all("<MouseWheel>", mousewheel_foo)
         self.root.bind("<Button-3>", close_foo)
+        self.main_list_win.bind("<Button-3>", menu_foo)
 
-    def draw_list(self,tracklist):
+    def draw_list(self, tracklist):
         for i in range(len(tracklist)):
             self.main_list.insert(i,tracklist[i])
+
+    def draw_menu(self, optionslist):
+        for i in range(len(optionslist)):
+            self.menu_list.insert(i,optionslist[i])
 
     def button_play(self):
 
@@ -160,6 +208,17 @@ class Display:
         self.set_poz(self.main_list_win,25, 101)
         self.make_animation_size(self.main_list_win,0,400,0,159)
         self.is_list_open = True
+
+    def hide_menu(self):
+        self.make_animation_size(self.main_menu, 100, 100, 110, 0)
+        self.set_poz(self.main_menu, 0,-100)
+        self.is_menu_open = False
+
+    def look_menu(self):
+        x, y = win32api.GetCursorPos()
+        self.set_poz(self.main_menu, x, y)
+        self.make_animation_size(self.main_menu, 100, 100, 0, 110)
+        self.is_menu_open = True
 
     def hide_root(self):
         self.make_animation(self.root,10,-30,100)
@@ -216,6 +275,9 @@ class Display:
 
     def is_listopen(self):
         return self.is_list_open
+        
+    def is_menuopen(self):
+        return self.is_menu_open
 
     def is_winhover(self):
         return self.is_win_hover
