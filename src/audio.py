@@ -3,7 +3,6 @@ from mutagen.mp3 import MP3
 from pygame import mixer
 import eyed3
 
-
 class Audio:
 
     def __init__(self):
