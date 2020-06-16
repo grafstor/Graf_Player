@@ -32,11 +32,11 @@ class Display:
         self.root.attributes('-topmost',True)
         self.root.wm_attributes("-transparentcolor", "black")
 
-        self.image1 = ImageTk.PhotoImage(file="1.png")
-        self.image2 = ImageTk.PhotoImage(file="2.png")
-        self.image3 = ImageTk.PhotoImage(file="3.png")
-        self.image5 = ImageTk.PhotoImage(file="5.png")
-        image = PIL.Image.open("6.png")
+        self.image1 = ImageTk.PhotoImage(file="pictures/play_button.png")
+        self.image2 = ImageTk.PhotoImage(file="picturescircle_button.png")
+        self.image3 = ImageTk.PhotoImage(file="picturespause_button.png")
+        self.image5 = ImageTk.PhotoImage(file="picturesvertical_border.png")
+        image = PIL.Image.open("pictureshorizontal_button.png")
         self.image6 = ImageTk.PhotoImage(image)
         self.image7 = ImageTk.PhotoImage(image.rotate(180))
 
